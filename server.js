@@ -1,123 +1,214 @@
-const express = require('express');
-const http = require('http');
-const { WebSocketServer } = require('ws');
-const path = require('path');
+/* Dollarprinter Core Dark-Theme Styling Context */
+:root {
+    --bg-main: #0b0e11;
+    --bg-panel: #151a22;
+    --bg-input: #1e2633;
+    --text-primary: #eaecef;
+    --text-muted: #848e9c;
+    --color-accent: #f0b90b;
+    --color-success: #0ecb81;
+    --color-danger: #f6465d;
+    --border-color: #2b3648;
+}
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
 
-app.use(express.static(path.join(__dirname, 'public')));
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
 
-const server = http.createServer(app);
-const wss = new WebSocketServer({ noServer: true });
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+}
 
-// Maintain exact profile balances as requested
-let accounts = {
-    real: { balance: 10.00, totalStake: 0, totalPayout: 0, runs: 0, profitLoss: 0, won: 0, lost: 0, history: [], journal: [] },
-    demo: { balance: 10000.00, totalStake: 0, totalPayout: 0, runs: 0, profitLoss: 0, won: 0, lost: 0, history: [], journal: [] }
-};
+.logo {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
 
-let activeProcessInterval = null;
-let currentActiveType = 'real'; // Track which profile is selected
+.logo span {
+    color: var(--color-accent);
+}
 
-server.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-        wss.emit('connection', ws, request);
-    });
-});
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-wss.on('connection', (ws) => {
-    console.log('🔌 Secured Trading Session Connected');
+.badge {
+    background: #2b3648;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
 
-    // Send the fresh data framework on connection
-    ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
+.balance {
+    font-weight: 700;
+    color: var(--color-success);
+}
 
-    ws.on('message', (message) => {
-        try {
-            const payload = JSON.parse(message);
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr 320px;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 60px);
+}
 
-            if (payload.action === 'SWITCH_ACCOUNT') {
-                currentActiveType = payload.accountMode;
-                ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
-            }
+.panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
 
-            if (payload.action === 'RESET_DEMO') {
-                accounts.demo = { balance: 10000.00, totalStake: 0, totalPayout: 0, runs: 0, profitLoss: 0, won: 0, lost: 0, history: [], journal: [] };
-                ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
-            }
+.panel h2 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-            if (payload.action === 'START_BOT') {
-                const activeConfig = accounts[currentActiveType];
-                const stakeValue = parseFloat(payload.stake) || 5.00;
-                const predictionTarget = parseInt(payload.prediction) || 1;
-                const assetName = payload.market || "Volatility 100 Index";
+/* Control Forms */
+.control-group {
+    margin-bottom: 20px;
+}
 
-                if (activeProcessInterval) clearInterval(activeProcessInterval);
+.control-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
 
-                // Add entry message to the journal log window
-                const initTime = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' GMT';
-                activeConfig.journal.unshift(`[${initTime}] Welcome back! Your messages have been restored. You are using your ${currentActiveType.toUpperCase()} account.`);
-                activeConfig.journal.unshift(`[${initTime}] Bot started running... Processing digit analysis.`);
+select, input {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
 
-                ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
+select:focus, input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
 
-                activeProcessInterval = setInterval(() => {
-                    activeConfig.runs++;
-                    activeConfig.won++;
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
 
-                    // Standard Deriv digit payout multiplier mapping (e.g., ~17.6% profit markup on a typical match)
-                    const profitPremium = parseFloat((stakeValue * 0.1764).toFixed(2));
-                    const totalPayout = parseFloat((stakeValue + profitPremium).toFixed(2));
+.btn-primary { background-color: var(--color-accent); color: #000; }
+.btn-primary:hover { background-color: #dfaa08; }
 
-                    activeConfig.balance = parseFloat((activeConfig.balance + profitPremium).toFixed(2));
-                    activeConfig.totalStake = parseFloat((activeConfig.totalStake + stakeValue).toFixed(2));
-                    activeConfig.totalPayout = parseFloat((activeConfig.totalPayout + totalPayout).toFixed(2));
-                    activeConfig.profitLoss = parseFloat((activeConfig.profitLoss + profitPremium).toFixed(2));
+.btn-success { background-color: var(--color-success); color: #fff; }
+.btn-success:hover { background-color: #0baf6f; }
 
-                    // Generate a random market index value resembling live index nodes
-                    const spotBase = parseFloat((554 + Math.random() * 0.5).toFixed(2));
-                    
-                    const contractItem = {
-                        id: Date.now(),
-                        asset: assetName,
-                        prediction: predictionTarget,
-                        spot: spotBase,
-                        stake: stakeValue,
-                        pnl: profitPremium,
-                        payout: totalPayout
-                    };
+.btn-danger { background-color: var(--color-danger); color: #fff; }
+.btn-danger:hover { background-color: #d63c50; }
 
-                    activeConfig.history.unshift(contractItem);
-                    
-                    const logTime = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' GMT';
-                    activeConfig.journal.unshift(`[${logTime}] Contract closed successfully. Profit: +${profitPremium} USD`);
+/* Chart Area */
+.chart-container {
+    flex-grow: 1;
+}
 
-                    ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
-                }, 3500);
-            }
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
 
-            if (payload.action === 'STOP_BOT') {
-                if (activeProcessInterval) {
-                    clearInterval(activeProcessInterval);
-                    activeProcessInterval = null;
-                }
-                const activeConfig = accounts[currentActiveType];
-                const logTime = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' GMT';
-                activeConfig.journal.unshift(`[${logTime}] Bot stopped by administrator request.`);
-                ws.send(JSON.stringify({ type: 'ACCOUNT_SYNC', currentType: currentActiveType, data: accounts }));
-            }
+.ticker-box {
+    background-color: var(--bg-input);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
 
-        } catch (err) {
-            console.error("Internal transaction mapping exception:", err);
-        }
-    });
+#live-price-ticker {
+    font-weight: 700;
+    color: var(--color-success);
+}
 
-    ws.on('close', () => {
-        if (activeProcessInterval) clearInterval(activeProcessInterval);
-    });
-});
+#tv-chart-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    background-color: #0b0e11;
+    border-radius: 4px;
+    min-height: 350px;
+}
 
-server.listen(PORT, () => {
-    console.log(`🚀 Automated Workspace running safely on port ${PORT}`);
-});
-        
+/* Logs and Activity Console */
+.panel-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+}
+
+.execution-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.activity-log {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-log h3 {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.console {
+    background-color: #0b0e11;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    flex-grow: 1;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.log-line {
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.log-line.system { color: var(--color-accent); }

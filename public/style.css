@@ -20,22 +20,22 @@
 body {
     background-color: var(--bg-main);
     color: var(--text-primary);
-    overflow: hidden;
+    overflow-y: auto; /* Allow smooth scrolling on mobile */
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
+    padding: 15px 20px;
     background-color: var(--bg-panel);
     border-bottom: 1px solid var(--border-color);
 }
 
 .logo {
     font-weight: 800;
-    font-size: 20px;
-    letter-spacing: 1px;
+    font-size: 18px;
+    letter-spacing: 0.5px;
 }
 
 .logo span { color: var(--color-accent); }
@@ -43,28 +43,29 @@ body {
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 .badge {
     background: #2b3648;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
 .balance {
     font-weight: 700;
+    font-size: 14px;
     color: var(--color-success);
 }
 
+/* Updated Layout: Flex container that naturally stacks on mobile */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: 300px 1fr 320px;
-    gap: 20px;
-    padding: 20px;
-    height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
 }
 
 .panel {
@@ -78,18 +79,18 @@ body {
 
 .panel h2 {
     font-size: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-transform: uppercase;
     color: var(--text-muted);
 }
 
-.control-group { margin-bottom: 20px; }
+.control-group { margin-bottom: 15px; }
 
 .control-group label {
     display: block;
     font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 select, input {
@@ -99,6 +100,7 @@ select, input {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-primary);
+    font-size: 14px;
 }
 
 .btn {
@@ -107,6 +109,7 @@ select, input {
     border: none;
     border-radius: 4px;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
 }
 
@@ -114,55 +117,70 @@ select, input {
 .btn-success { background-color: var(--color-success); color: #fff; }
 .btn-danger { background-color: var(--color-danger); color: #fff; }
 
-.chart-container { flex-grow: 1; }
+.chart-container { order: -1; } /* Pushes the live chart to the top of the mobile screen */
 
 .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+}
+
+.chart-header h3 {
+    font-size: 15px;
 }
 
 .ticker-box {
     background-color: var(--bg-input);
     padding: 6px 12px;
     border-radius: 4px;
+    font-size: 13px;
 }
 
 #tv-chart-wrapper {
-    flex-grow: 1;
     width: 100%;
     background-color: #0b0e11;
     border-radius: 4px;
+    height: 300px; /* Explicit height ensures the TradingView chart area displays on phone screens */
 }
 
 .panel-desc {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
 .execution-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 30px;
+    gap: 10px; /* Aligns buy/sell side-by-side on mobile devices */
+    margin-bottom: 20px;
 }
 
-.activity-log { flex-grow: 1; display: flex; flex-direction: column; }
+.activity-log { display: flex; flex-direction: column; }
 
 .console {
     background-color: #0b0e11;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    flex-grow: 1;
     padding: 10px;
     font-family: monospace;
     font-size: 11px;
     overflow-y: auto;
-    max-height: 220px;
+    height: 150px;
 }
 
 .log-line { margin-bottom: 6px; }
 .log-line.system { color: var(--color-accent); }
-  
+
+/* Desktop view: Automatically restores side-by-side panels on computers */
+@media (min-width: 900px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr 320px;
+        height: calc(100vh - 60px);
+    }
+    .chart-container { order: 0; }
+    #tv-chart-wrapper { height: 100%; }
+    .execution-buttons { flex-direction: column; }
+    .console { height: 100%; max-height: 220px; }
+    }

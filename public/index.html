@@ -3,178 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOLLARPRINTER Workspace</title>
+    <title>DOLLARPRINTER Core Core</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #101418; color: #e4e7eb; margin: 0; padding: 0; font-size: 14px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0c1014; color: #e4e7eb; margin: 0; padding: 0; font-size: 14px; -webkit-user-select: none; user-select: none; }
         
-        /* Top Navigation Bar resembling Deriv layout */
-        .top-navbar { background: #161a1e; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #24292f; }
-        .nav-left { display: flex; align-items: center; gap: 15px; }
-        .menu-icon { font-size: 20px; color: #848e9c; cursor: pointer; }
-        .brand-logo { background: #cf304a; color: #fff; padding: 4px 8px; font-weight: bold; font-size: 11px; border-radius: 4px; text-transform: uppercase; }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .btn-deposit { background: #8e44ad; color: #fff; border: none; padding: 6px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .balance-dropdown { display: flex; align-items: center; gap: 5px; background: #1f262f; padding: 6px 12px; border-radius: 20px; border: 1px solid #2e353f; cursor: pointer; }
-        .currency-icon { width: 16px; height: 16px; background: #555; border-radius: 50%; display: inline-block; }
-        .balance-text { color: #00c076; font-weight: bold; }
+        /* Top Navigation Header resembling video */
+        .deriv-top-nav { background: #161a1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f262f; }
+        .nav-branding { display: flex; align-items: center; gap: 10px; }
+        .menu-bars { font-size: 18px; color: #848e9c; cursor: pointer; }
+        .badge-country { background: #2e353f; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #3f4754; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-withdraw { background: #9b59b6; color: #fff; border: none; padding: 6px 14px; border-radius: 16px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .profile-wallet-trigger { display: flex; align-items: center; gap: 6px; background: #1f262f; padding: 6px 12px; border-radius: 16px; border: 1px solid #2e353f; cursor: pointer; }
+        .flag-placeholder { font-size: 14px; }
+        .live-balance-num { color: #00c076; font-weight: bold; }
+        .arrow-indicator { font-size: 10px; color: #848e9c; margin-left: 4px; }
 
-        /* Secondary Navigation Headers */
-        .sub-header-tabs { background: #161a1e; display: flex; border-bottom: 1px solid #24292f; }
-        .sub-tab { flex: 1; text-align: center; padding: 12px 0; color: #848e9c; font-weight: 500; border-bottom: 2px solid transparent; cursor: pointer; }
-        .sub-tab.active { color: #fff; border-bottom: 2px solid #3498db; background: #1c2127; }
+        /* Secondary Category Tabs */
+        .workspace-tabs { background: #161a1e; display: flex; border-bottom: 1px solid #1f262f; text-align: center; }
+        .workspace-tab-item { flex: 1; padding: 12px 0; color: #848e9c; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; }
+        .workspace-tab-item.active { color: #fff; border-bottom: 2px solid #2980b9; background: #1a2026; }
 
-        /* Main Workspace Panels */
-        .workspace-container { padding: 15px; max-width: 480px; margin: 0 auto; padding-bottom: 100px; }
-        .panel-card { background: #161a1e; border: 1px solid #24292f; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 5px; }
-        input, select { background: #1f262f; border: 1px solid #2e353f; color: #fff; padding: 10px; border-radius: 4px; width: 94%; font-size: 14px; }
+        /* Global Viewport Core Panels */
+        .app-workspace-body { padding: 15px; max-width: 460px; margin: 0 auto; padding-bottom: 90px; }
+        .ui-panel-card { background: #161a1e; border: 1px solid #1f262f; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
 
-        /* Transaction Table Log resembling the screenshots */
-        .log-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .log-table th { text-align: left; color: #848e9c; font-size: 12px; padding-bottom: 8px; border-bottom: 1px solid #1f262f; }
-        .log-table td { padding: 12px 0; border-bottom: 1px solid #1f262f; font-size: 13px; }
-        .type-indicator { display: flex; align-items: center; gap: 5px; font-weight: bold; color: #00c076; }
-        .type-loss { color: #cf304a; }
-        
-        /* Stats Breakdown Board */
-        .stats-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-        .stat-box { flex: 1; min-width: 45%; background: #1f262f; padding: 10px; border-radius: 4px; box-sizing: border-box; }
-        .stat-label { font-size: 11px; color: #848e9c; margin-bottom: 2px; }
-        .stat-value { font-size: 15px; font-weight: bold; }
+        .form-row { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 4px; }
+        input, select { background: #1f262f; border: 1px solid #2e353f; color: #fff; padding: 10px; border-radius: 4px; width: 94%; font-size: 14px; box-sizing: border-box; }
 
-        /* Sticky Control Bar Footer */
-        .execution-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #161a1e; border-top: 1px solid #24292f; padding: 15px; display: flex; gap: 12px; justify-content: center; }
-        .btn-ctl { flex: 1; max-width: 200px; border: none; padding: 14px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; color: #fff; }
-        .btn-run { background: #00c076; }
-        .btn-pause { background: #f39c12; }
-        .btn-stop { background: #cf304a; display: none; }
+        /* Modern Real / Demo Modal Selector Overlays */
+        .modal-account-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
+        .modal-account-card { background: #161a1e; border: 1px solid #2e353f; border-radius: 8px; width: 90%; max-width: 340px; padding: 15px; }
+        .modal-tab-bar { display: flex; border-bottom: 1px solid #2e353f; margin-bottom: 12px; }
+        .modal-tab { flex: 1; text-align: center; padding: 10px 0; color: #848e9c; cursor: pointer; font-weight: bold; }
+        .modal-tab.active { color: #fff; border-bottom: 2px solid #cf304a; }
+        .account-selector-row { display: flex; justify-content: space-between; align-items: center; background: #1f262f; padding: 12px; border-radius: 6px; margin-top: 8px; cursor: pointer; border: 1px solid transparent; }
+        .account-selector-row:hover { border-color: #444; }
+        .reset-demo-link { font-size: 12px; color: #3498db; cursor: pointer; margin-top: 10px; display: inline-block; }
+
+        /* Dynamic Contract Settle Layout Rows */
+        .settled-item-container { background: #1f262f; border: 1px solid #2e353f; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .settle-badge { background: rgba(0, 192, 118, 0.15); color: #00c076; font-weight: bold; padding: 3px 6px; border-radius: 4px; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; display: inline-block; }
+        .pnl-green { color: #00c076; font-size: 16px; font-weight: bold; }
+
+        /* Summary Analytics Display Cards */
+        .analytics-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .analytic-tile { flex: 1; min-width: 46%; background: #1f262f; padding: 10px; border-radius: 4px; border: 1px solid #2e353f; }
+        .tile-lbl { font-size: 11px; color: #848e9c; margin-bottom: 2px; }
+        .tile-val { font-size: 15px; font-weight: bold; }
+
+        /* Journal Output Terminal Lines */
+        .terminal-shell { background: #090c0f; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 12px; color: #a1b0c0; max-height: 250px; overflow-y: auto; line-height: 1.6; }
+        .shell-line { border-bottom: 1px solid #13171c; padding: 4px 0; }
+
+        /* Fixed Footer Runtime Control Mechanics */
+        .bottom-sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #161a1e; border-top: 1px solid #1f262f; padding: 12px; display: flex; gap: 10px; justify-content: center; z-index: 900; }
+        .btn-action-core { flex: 1; max-width: 180px; border: none; padding: 14px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; color: #fff; }
+        .btn-start-run { background: #00c076; }
+        .btn-stop-kill { background: #cf304a; display: none; }
+        .status-marquee-msg { color: #848e9c; font-size: 12px; text-align: center; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation Frame -->
-    <div class="top-navbar">
-        <div class="nav-left">
-            <span class="menu-icon">☰</span>
-            <div class="brand-logo">KSH USD</div>
+    <!-- Header Frame View -->
+    <div class="deriv-top-nav">
+        <div class="nav-branding">
+            <span class="menu-bars">☰</span>
+            <div class="badge-country">KSH USD</div>
         </div>
-        <div class="nav-right">
-            <button class="btn-deposit">Deposit</button>
-            <div class="balance-dropdown">
-                <span class="currency-icon"></span>
-                <span class="balance-text" id="top-balance">11,006.66 USD</span>
+        <div class="nav-actions">
+            <button class="btn-withdraw">Withdraw</button>
+            <div class="profile-wallet-trigger" onclick="toggleAccountModal(true)">
+                <span class="flag-placeholder" id="flag-display">🇺🇸</span>
+                <span class="live-balance-num" id="display-top-balance">0.26 USD</span>
+                <span class="arrow-indicator">▼</span>
             </div>
         </div>
     </div>
 
-    <!-- Interface Sub-tabs -->
-    <div class="sub-header-tabs">
-        <div class="sub-tab" id="tab-config" onclick="switchPanel('config')">Summary</div>
-        <div class="sub-tab active" id="tab-transactions" onclick="switchPanel('transactions')">Transactions</div>
-        <div class="sub-tab" id="tab-journal" onclick="switchPanel('journal')">Journal</div>
+    <!-- Category Nav Controls -->
+    <div class="workspace-tabs">
+        <div class="workspace-tab-item" id="tab-btn-summary" onclick="navigateToPanel('summary')">Summary</div>
+        <div class="workspace-tab-item active" id="tab-btn-transactions" onclick="navigateToPanel('transactions')">Transactions</div>
+        <div class="workspace-tab-item" id="tab-btn-journal" onclick="navigateToPanel('journal')">Journal</div>
     </div>
 
-    <div class="workspace-container">
-        <!-- Configuration Panel Section -->
-        <div id="panel-config" style="display: none;">
-            <div class="panel-card">
-                <h3>Bot Parameters</h3>
-                <div class="input-group">
-                    <label>Asset Class</label>
-                    <select id="asset-type">
-                        <option>Volatility 15 (1s) Index</option>
-                        <option>Volatility 100 Index</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Trade Sizing Stake Amount (USD)</label>
-                    <input type="number" id="trade-stake" value="50.00">
-                </div>
-                <div class="input-group">
-                    <label>Forced Outcome Rule</label>
-                    <select id="forced-outcome">
-                        <option value="WIN_ALWAYS">Win Always (100% Win Strategy)</option>
-                        <option value="NORMAL">Organic Trading Mode</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Transactions Panel Section -->
-        <div id="panel-transactions">
-            <div class="panel-card">
-                <table class="log-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Entry/Exit spot</th>
-                            <th style="text-align: right;">Buy price and P/L</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transaction-rows">
-                        <!-- Simulated Rows Feed Dynamically -->
-                    </tbody>
-                </table>
-
-                <!-- Summary Analytics Matrix Display -->
-                <div class="stats-grid">
-                    <div class="stat-box"><div class="stat-label">Total stake</div><div class="stat-value" id="stat-stake">0.00 USD</div></div>
-                    <div class="stat-box"><div class="stat-label">Total payout</div><div class="stat-value" id="stat-payout">0.00 USD</div></div>
-                    <div class="stat-box"><div class="stat-label">No. of runs</div><div class="stat-value" id="stat-runs">0</div></div>
-                    <div class="stat-box"><div class="stat-label">Total profit/loss</div><div class="stat-value" id="stat-pnl">0.00 USD</div></div>
-                    <div class="stat-box"><div class="stat-label">Contracts won</div><div class="stat-value" id="stat-won" style="color:#00c076;">0</div></div>
-                    <div class="stat-box"><div class="stat-label">Contracts lost</div><div class="stat-value" id="stat-lost" style="color:#cf304a;">0</div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Empty Journal Placeholder -->
-        <div id="panel-journal" style="display: none;">
-            <div class="panel-card">
-                <p style="color: #848e9c; text-align: center; margin: 20px 0;">Journal logs are currently clear.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Execution Footer Controls -->
-    <div class="execution-bar">
-        <button class="btn-ctl btn-run" id="btn-run" onclick="executeBotEngine()">Run Bot</button>
-        <button class="btn-ctl btn-pause" id="btn-pause" style="display:none;">|| Pause</button>
-        <button class="btn-ctl btn-stop" id="btn-stop" onclick="killBotEngine()">Stop</button>
-    </div>
-
-    <script>
-        let runLoopInterval = null;
-        let runningBalance = 11006.66;
-        let metrics = { stake: 0, payout: 0, runs: 0, pnl: 0, won: 0, lost: 0 };
-
-        function switchPanel(panelName) {
-            document.getElementById('panel-config').style.display = panelName === 'config' ? 'block' : 'none';
-            document.getElementById('panel-transactions').style.display = panelName === 'transactions' ? 'block' : 'none';
-            document.getElementById('panel-journal').style.display = panelName === 'journal' ? 'block' : 'none';
-
-            document.getElementById('tab-config').classList.toggle('active', panelName === 'config');
-            document.getElementById('tab-transactions').classList.toggle('active', panelName === 'transactions');
-            document.getElementById('tab-journal').classList.toggle('active', panelName === 'journal');
-        }
-
-        function executeBotEngine() {
-            document.getElementById('btn-run').style.display = 'none';
-            document.getElementById('btn-stop').style.display = 'block';
-            switchPanel('transactions');
-
-            const selectedStake = parseFloat(document.getElementById('trade-stake').value) || 50.00;
-            const outcomeStrategy = document.getElementById('forced-outcome').value;
-
-            runLoopInterval = setInterval(() => {
-                metrics.runs++;
-
-                // Enforce the "Win Always" logic parameter
-                let isWinner = true;
-                if (outcomeStrategy === 'NORMAL') {
-                    isWinner = Math.random() > 0.4; // 60% standard chance
-                }
-
+    <!-- Central Viewport Display Layout Container -->
+    <div class="app-workspace-body">
         
+        <!-- Summary Dashboard Viewport Matrix Panel -->
+        <div id="panel-summary" style="display: none;">
+            <div class="ui-panel-card">
+                <h3>Quick Parameters Settings</h3>
+                <div class="form-row">
+                    <label>Target Execution Asset Index</label>
+                    <select id="config-market-target">
+                        <option value="Volatility 100 Index">Volatility 100 Index</option>
+                        <option value="Volatility 15 (1s) Index">Volatility 15 (1s) Index</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Contract Target Sizing Stake (USD)</label>
+                    <input type="number" id="config-stake-amount" value="5.00" step="1">
+                </div>
+                <div class="form-row">
+                    <label>Digit Over/Under Prediction Sizing</label>
+                    <input type="number" id="config-prediction" value="1" min="0" max="9">
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Dashboard Feed Viewport Panel -->
+        <div id="panel-transactions">
+            <!-- Analytics Summary Component -->
+            <div class="ui-panel-card" style="margin-bottom:12px;">
+                <div class="analytics-grid">
+                    <div class="analytic-tile"><div class="tile-lbl">Total stake</div><div class="tile-val" id="stat-stake">0.00 USD</div></div>
+                    <div class="analytic-tile"><div class="tile-lbl">Total payout</div><div class="tile-val" id="stat-payout">0.00 USD</div></div>
+                    <div class="analytic-tile"><div class="tile-lbl">No. of runs</div><div class="tile-val" id="stat-runs">0</div></div>
+                    <div class="analytic-tile"><div class="tile-lbl">Total profit/loss</div><div class="tile-val" id="stat-pnl" style="color:#848e9c;">0.00 USD</div></div>
+                    <div class="analytic-tile"><div class="tile-lbl">Contracts won</div><div class="tile-val" id="stat-won" style="color:#00c076;">0</div></div>
+                    <div class="analytic-tile"><div class="tile-lbl">Contracts lost</div><div class="tile-val" id="stat-lost" style="color:#cf304a;">0</div></div>
+                </div>
+            </div>
+
+            <!-- List rows feed -->
+            <div id="contracts-feed-rows-container">
+                <!-- Transaction log list cards settle here dynamically -->
+            </div>
+        </div>
+
+        <!-- Journal Console Viewport Terminal Panel -->
+        <div id="panel-journal" style="display: none;">
+            <div class="ui-panel-card">
+                <h3>System Core Diagnostics Logs</h3>
+                <div class="terminal-shell" id="journal-console-container">
+                    <!-- Lines push directly inside -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Fixed Core Controls Footer Frame -->
+    <div class="bottom-sticky-bar">
+        <div style="flex:1; max-width:380px; display:flex; flex-direction:column;">
+            <div style="display:flex; gap:10px;">
+                

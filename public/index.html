@@ -2,124 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dollarprinter Workspace - Real Execution Terminal</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://jsdelivr.net"></script>
-    <script type="text/javascript" src="https://tradingview.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOLLARPRINTER Live Secure Core</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0c0f12; color: #e4e7eb; padding: 20px; margin: 0; }
+        .header-bar { border-bottom: 1px solid #1f262f; padding-bottom: 15px; margin-bottom: 25px; }
+        .balance-title { color: #848e9c; font-size: 14px; margin: 0 0 5px 0; }
+        .balance-value { font-size: 28px; font-weight: bold; color: #f0b90b; margin: 0; }
+        .market-section { background: #161a1e; border-radius: 8px; padding: 20px; border: 1px solid #1f262f; max-width: 400px; }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .asset-name { font-size: 18px; font-weight: 600; }
+        .asset-price { font-size: 20px; font-weight: bold; color: #00c076; transition: color 0.2s ease; }
+        .input-group { margin-top: 15px; }
+        label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 5px; }
+        input { background: #24292e; border: 1px solid #3f4651; color: #fff; padding: 10px; border-radius: 4px; width: 90%; font-size: 16px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        button { flex: 1; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; color: #fff; }
+        .btn-buy { background: #00c076; }
+        .btn-buy:hover { background: #00a867; }
+        .btn-sell { background: #cf304a; }
+        .btn-sell:hover { background: #b82a40; }
+        .positions-section { margin-top: 25px; max-width: 400px; padding: 10px 0; }
+        .status-text { color: #848e9c; font-style: italic; font-size: 14px; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white font-sans overflow-hidden">
+<body>
 
-    <header class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <span class="text-xl font-black tracking-wider text-green-400">DOLLARPRINTER</span>
-            <span class="bg-green-500 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Live Secure Core</span>
+    <div class="header-bar">
+        <h2>DOLLARPRINTER Live Secure Core</h2>
+        <p class="balance-title">Verified Real Balance</p>
+        <p class="balance-value">$25,000.00</p>
+    </div>
+
+    <div class="market-section">
+        <h3>Active Asset Market</h3>
+        
+        <div class="asset-row">
+            <span class="asset-name">BTC / USD</span>
+            <span class="asset-price" id="btc-price">Connecting...</span>
         </div>
-        <div class="flex items-center space-x-6">
-            <div class="text-right">
-                <p class="text-xs text-gray-400 uppercase font-semibold tracking-wider">Verified Real Balance</p>
-                <p id="account-balance" class="text-2xl font-mono font-bold text-green-400">$25,000.00</p>
-            </div>
+
+        <div class="input-group">
+            <label for="amount">Trade Sizing Order Amount</label>
+            <input type="number" id="amount" value="0.1" step="0.01">
         </div>
-    </header>
 
-    <main class="flex h-screen">
-        <section class="w-3/4 p-4 h-5/6">
-            <div id="tradingview_chart" class="w-full h-full rounded-lg overflow-hidden border border-gray-700"></div>
-        </section>
+        <div class="btn-group">
+            <button class="btn-buy">Instant Buy</button>
+            <button class="btn-sell">Instant Sell</button>
+        </div>
+    </div>
 
-        <section class="w-1/4 bg-gray-800 border-l border-gray-700 p-6 flex flex-col space-y-6">
-            <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-bold text-gray-400 uppercase">Active Asset Market</h2>
-                <div class="flex justify-between items-baseline mt-1">
-                    <span class="text-lg font-bold">BTC / USD</span>
-                    <span id="live-market-ticker" class="text-xl font-mono text-yellow-400">0.00</span>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <label class="block text-sm font-bold text-gray-400 uppercase">Trade Sizing Order Amount</label>
-                <input id="trade-qty" type="number" value="0.1" step="0.01" min="0.01" class="w-full bg-gray-900 border border-gray-700 rounded p-3 font-mono text-white focus:outline-none focus:border-green-500">
-                
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <button onclick="submitSimulatedTrade('BUY')" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded uppercase transition duration-150">Instant Buy</button>
-                    <button onclick="submitSimulatedTrade('SELL')" class="bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded uppercase transition duration-150">Instant Sell</button>
-                </div>
-            </div>
-
-            <div class="flex-1 bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-y-auto">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Active Open Inventory Positions</h3>
-                <div id="position-container" class="space-y-2 text-sm">
-                    <p class="text-gray-500 italic">No floating asset positions currently active.</p>
-                </div>
-                <div class="border-t border-gray-700 mt-4 pt-2 flex justify-between">
-                    <span class="text-gray-400 text-xs uppercase font-bold">Running Open PnL:</span>
-                    <span id="running-pnl" class="font-mono font-bold">$0.00</span>
-                </div>
-            </div>
-        </section>
-    </main>
+    <div class="positions-section">
+        <h3>Active Open Inventory Positions</h3>
+        <p class="status-text">No floating asset positions currently active.</p>
+        <p style="font-size: 14px; font-weight: 500;">Running Open PnL: <span style="color:#848e9c;">$0.00</span></p>
+    </div>
 
     <script>
-        const socket = io();
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}`;
+        const socket = new WebSocket(wsUrl);
 
-        new TradingView.widget({
-            "width": "100%",
-            "height": "100%",
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "1",
-            "timezone": "Etc/UTC",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_chart"
-        });
+        let lastPrice = 0;
 
-        socket.on('marketUpdate', (packet) => {
-            document.getElementById('live-market-ticker').innerText = packet.price.toFixed(2);
-            document.getElementById('account-balance').innerText = `$${packet.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            
-            const pnlElement = document.getElementById('running-pnl');
-            pnlElement.innerText = (packet.pnl >= 0 ? '+' : '') + `$${packet.pnl.toFixed(2)}`;
-            pnlElement.className = packet.pnl >= 0 ? 'text-green-400 font-mono font-bold' : 'text-red-400 font-mono font-bold';
-
-            const container = document.getElementById('position-container');
-            if(Object.keys(packet.openPositions).length === 0) {
-                container.innerHTML = `<p class="text-gray-500 italic">No floating asset positions currently active.</p>`;
-            } else {
-                let htmlOutput = '';
-                for(let key in packet.openPositions) {
-                    let position = packet.openPositions[key];
-                    htmlOutput += `
-                        <div class="flex justify-between border-b border-gray-800 pb-2">
-                            <div>
-                                <p class="font-bold text-green-400">${key}</p>
-                                <p class="text-xs text-gray-400">Qty: ${position.quantity}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-mono text-gray-300">Entry: $${position.entryPrice.toFixed(2)}</p>
-                            </div>
-                        </div>`;
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.type === 'PRICE_UPDATE' || message.type === 'INITIAL_PRICES') {
+                const btcPrice = message.data.BTC;
+                if (btcPrice) {
+                    const priceElement = document.getElementById('btc-price');
+                    priceElement.innerText = `$${btcPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    
+                    if (lastPrice > 0) {
+                        if (btcPrice > lastPrice) {
+                            priceElement.style.color = '#00c076';
+                        } else if (btcPrice < lastPrice) {
+                            priceElement.style.color = '#cf304a';
+                        }
+                    }
+                    lastPrice = btcPrice;
                 }
-                container.innerHTML = htmlOutput;
             }
-        });
+        };
 
-        function submitSimulatedTrade(action) {
-            const qty = parseFloat(document.getElementById('trade-qty').value);
-            fetch('/api/trade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderType: action, quantity: qty })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(!data.success) alert(data.message);
-            });
-        }
+        socket.onclose = () => {
+            document.getElementById('btc-price').innerText = 'Disconnected';
+            document.getElementById('btc-price').style.color = '#848e9c';
+        };
+
+        socket.onerror = (error) => {
+            console.error('WebSocket connection error:', error);
+        };
     </script>
 </body>
-                  </html>
-                  
+</html>

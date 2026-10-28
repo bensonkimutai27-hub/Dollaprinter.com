@@ -1,141 +1,93 @@
-/**
- * Dollarprinter Clone - Deriv API Integration
- * Core Logic for WebSocket Connection, Authentication, and Live Data Streaming
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumTrade | Precision Workspace</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Charting Library Integration -->
+    <script src="https://unpkg.com"></script>
+</head>
+<body>
 
-class DerivTradingEngine {
-    constructor(appId) {
-        // Deriv WebSocket endpoint (using official App ID)
-        this.wsUrl = `wss://://derivws.com{appId}`;
-        this.socket = null;
-        this.isAuthorized = false;
-    }
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="logo">QUANTUM<span>TRADE</span></div>
+        <div class="user-profile">
+            <span class="badge">Virtual Account</span>
+            <span id="balance-display" class="balance">$10,000.00</span>
+        </div>
+    </header>
 
-    // 1. Initialize the WebSocket Connection
-    init() {
-        this.socket = new WebSocket(this.wsUrl);
+    <!-- Main Workspace Grid -->
+    <main class="dashboard-grid">
+        
+        <!-- Left Sidebar: Bot Configuration Controls -->
+        <section class="panel bot-config">
+            <h2>Bot Control Center</h2>
+            <div class="control-group">
+                <label for="asset-select">Select Asset</label>
+                <select id="asset-select">
+                    <option value="R_100">Volatility 100 Index</option>
+                    <option value="R_50">Volatility 50 Index</option>
+                    <option value="frxEURUSD">EUR/USD Forex</option>
+                </select>
+            </div>
 
-        this.socket.onopen = (connection) => {
-            console.log("Successfully connected to Deriv Exchange API Server.");
-            // Automatically ping every 30 seconds to keep the connection alive
-            this.startKeepAlive();
-        };
+            <div class="control-group">
+                <label for="stake-amount">Stake Amount (USD)</label>
+                <input type="number" id="stake-amount" value="10" min="1">
+            </div>
 
-        this.socket.onmessage = (message) => {
-            const data = JSON.parse(message.data);
-            this.handleIncomingData(data);
-        };
+            <div class="control-group">
+                <label for="strategy-select">Trading Algorithm</label>
+                <select id="strategy-select">
+                    <option value="martingale">Martingale Multiplier</option>
+                    <option value="rsi_trend">RSI Trend Follower</option>
+                </select>
+            </div>
 
-        this.socket.onerror = (error) => {
-            console.error("WebSocket Error: ", error);
-        };
+            <button id="start-bot-btn" class="btn btn-primary">Launch Auto-Bot</button>
+        </section>
 
-        this.socket.onclose = () => {
-            console.log("Connection closed. Reconnecting...");
-            setTimeout(() => this.init(), 5000); // Auto-reconnect after 5 seconds
-        };
-    }
+        <!-- Middle Column: Live Financial Graph Canvas -->
+        <section class="panel chart-container">
+            <div class="chart-header">
+                <h3 id="active-asset-title">Volatility 100 Index</h3>
+                <div class="ticker-box">
+                    Live Price: <span id="live-price-ticker">Loading...</span>
+                </div>
+            </div>
+            <!-- The charting library will automatically inject the interactive graph canvas inside this wrapper div -->
+            <div id="tv-chart-wrapper"></div>
+        </section>
 
-    // 2. Authenticate the User using their API Token
-    authorize(apiToken) {
-        if (this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify({ authorize: apiToken }));
-        } else {
-            console.error("Cannot authorize. Socket is not open.");
-        }
-    }
+        <!-- Right Sidebar: Instant Execution & Operations -->
+        <section class="panel trade-execution">
+            <h2>Manual Overrides</h2>
+            <p class="panel-desc">Instantly buy or sell contracts directly to the market engine.</p>
+            
+            <div class="execution-buttons">
+                <button id="btn-rise" class="btn btn-success">
+                    <span class="icon">▲</span> Rise / Call
+                </button>
+                <button id="btn-fall" class="btn btn-danger">
+                    <span class="icon">▼</span> Fall / Put
+                </button>
+            </div>
 
-    // 3. Subscribe to Live Market Assets (e.g., Volatility 100 Index or Forex pairs)
-    subscribeToTicks(symbol = 'R_100') {
-        if (this.socket.readyState === WebSocket.OPEN) {
-            console.log(`Subscribing to real-time ticks for: ${symbol}`);
-            this.socket.send(JSON.stringify({ ticks: symbol }));
-        }
-    }
+            <div class="activity-log">
+                <h3>System Activities Log</h3>
+                <div id="log-console" class="console">
+                    <div class="log-line system">[System]: Workspace initialized. Awaiting API network link...</div>
+                </div>
+            </div>
+        </section>
 
-    // 4. Place a Trade Contract (Buy Rise/Fall or Higher/Lower)
-    placeTrade(amount, contractType, currency = 'USD', duration = 1, durationUnit = 'm', symbol = 'R_100') {
-        if (!this.isAuthorized) {
-            console.error("You must authorize your API token before placing a trade.");
-            return;
-        }
+    </main>
 
-        const proposalRequest = {
-            buy: 1,
-            price: amount,
-            parameters: {
-                amount: amount,
-                basis: "stake",
-                contract_type: contractType, // 'CALL' (Rise/Up) or 'PUT' (Fall/Down)
-                currency: currency,
-                duration: duration,
-                duration_unit: durationUnit,
-                symbol: symbol
-            }
-        };
-
-        this.socket.send(JSON.stringify(proposalRequest));
-    }
-
-    // 5. Route Incoming API Responses to UI Components
-    handleIncomingData(data) {
-        const msgType = data.msg_type;
-
-        switch (msgType) {
-            case 'authorize':
-                if (data.error) {
-                    console.error("Authorization Failed:", data.error.message);
-                    this.isAuthorized = false;
-                } else {
-                    console.log(`Authorized successfully! Welcome ${data.authorize.email}`);
-                    this.isAuthorized = true;
-                    // Update UI with Virtual Account Balance ($10,000)
-                    document.getElementById('balance-display').innerText = `$${data.authorize.balance}`;
-                }
-                break;
-
-            case 'tick':
-                if (data.tick) {
-                    const price = data.tick.quote;
-                    const epoch = data.tick.epoch;
-                    this.updateUIChart(price, epoch);
-                }
-                break;
-
-            case 'buy':
-                if (data.error) {
-                    console.error("Trade Execution Failed:", data.error.message);
-                } else {
-                    console.log(`Trade placed! Contract ID: ${data.buy.contract_id}`);
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    // 6. UI Render Placeholders (To link with your cloned frontend template)
-    updateUIChart(price, time) {
-        // Send this live stream data straight to your chart UI component
-        const priceElement = document.getElementById('live-price-ticker');
-        if (priceElement) {
-            priceElement.innerText = price;
-        }
-    }
-
-    startKeepAlive() {
-        setInterval(() => {
-            if (this.socket.readyState === WebSocket.OPEN) {
-                this.socket.send(JSON.stringify({ ping: 1 }));
-            }
-        }, 30000);
-    }
-}
-
-// Example Usage on your cloned page:
-// const botEngine = new DerivTradingEngine('YOUR_DERIV_APP_ID');
-// botEngine.init();
-// botEngine.authorize('YOUR_USER_API_TOKEN');
-// botEngine.subscribeToTicks('R_100');
-
+    <!-- Core WebSocket Link -->
+    <script src="deriv-trading-bot.js"></script>
+</body>
+                </html>
+                

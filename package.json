@@ -1,15 +1,13 @@
 {
-  "name": "dollarprinter.com",
+  "name": "dollarprinter-clone",
   "version": "1.0.0",
-  "description": "Simulated real-time workspace terminal clone",
+  "description": "Precision automated trading dashboard workspace built on Express and WebSockets",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5",
-    "ws": "^8.16.0"
+    "express": "^4.19.2"
   },
   "engines": {
     "node": ">=18.0.0"

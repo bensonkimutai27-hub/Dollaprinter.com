@@ -1,154 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOLLARPRINTER Core Core</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0c1014; color: #e4e7eb; margin: 0; padding: 0; font-size: 14px; -webkit-user-select: none; user-select: none; }
-        
-        /* Top Navigation Header resembling video */
-        .deriv-top-nav { background: #161a1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f262f; }
-        .nav-branding { display: flex; align-items: center; gap: 10px; }
-        .menu-bars { font-size: 18px; color: #848e9c; cursor: pointer; }
-        .badge-country { background: #2e353f; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #3f4754; }
-        .nav-actions { display: flex; align-items: center; gap: 12px; }
-        .btn-withdraw { background: #9b59b6; color: #fff; border: none; padding: 6px 14px; border-radius: 16px; font-weight: bold; font-size: 12px; cursor: pointer; }
-        .profile-wallet-trigger { display: flex; align-items: center; gap: 6px; background: #1f262f; padding: 6px 12px; border-radius: 16px; border: 1px solid #2e353f; cursor: pointer; }
-        .flag-placeholder { font-size: 14px; }
-        .live-balance-num { color: #00c076; font-weight: bold; }
-        .arrow-indicator { font-size: 10px; color: #848e9c; margin-left: 4px; }
+/**
+ * Dollarprinter Clone - Deriv API Integration
+ * Core Logic for WebSocket Connection, Authentication, and Live Data Streaming
+ */
 
-        /* Secondary Category Tabs */
-        .workspace-tabs { background: #161a1e; display: flex; border-bottom: 1px solid #1f262f; text-align: center; }
-        .workspace-tab-item { flex: 1; padding: 12px 0; color: #848e9c; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; }
-        .workspace-tab-item.active { color: #fff; border-bottom: 2px solid #2980b9; background: #1a2026; }
+class DerivTradingEngine {
+    constructor(appId) {
+        // Deriv WebSocket endpoint (using official App ID)
+        this.wsUrl = `wss://://derivws.com{appId}`;
+        this.socket = null;
+        this.isAuthorized = false;
+    }
 
-        /* Global Viewport Core Panels */
-        .app-workspace-body { padding: 15px; max-width: 460px; margin: 0 auto; padding-bottom: 90px; }
-        .ui-panel-card { background: #161a1e; border: 1px solid #1f262f; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+    // 1. Initialize the WebSocket Connection
+    init() {
+        this.socket = new WebSocket(this.wsUrl);
 
-        .form-row { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 4px; }
-        input, select { background: #1f262f; border: 1px solid #2e353f; color: #fff; padding: 10px; border-radius: 4px; width: 94%; font-size: 14px; box-sizing: border-box; }
+        this.socket.onopen = (connection) => {
+            console.log("Successfully connected to Deriv Exchange API Server.");
+            // Automatically ping every 30 seconds to keep the connection alive
+            this.startKeepAlive();
+        };
 
-        /* Modern Real / Demo Modal Selector Overlays */
-        .modal-account-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
-        .modal-account-card { background: #161a1e; border: 1px solid #2e353f; border-radius: 8px; width: 90%; max-width: 340px; padding: 15px; }
-        .modal-tab-bar { display: flex; border-bottom: 1px solid #2e353f; margin-bottom: 12px; }
-        .modal-tab { flex: 1; text-align: center; padding: 10px 0; color: #848e9c; cursor: pointer; font-weight: bold; }
-        .modal-tab.active { color: #fff; border-bottom: 2px solid #cf304a; }
-        .account-selector-row { display: flex; justify-content: space-between; align-items: center; background: #1f262f; padding: 12px; border-radius: 6px; margin-top: 8px; cursor: pointer; border: 1px solid transparent; }
-        .account-selector-row:hover { border-color: #444; }
-        .reset-demo-link { font-size: 12px; color: #3498db; cursor: pointer; margin-top: 10px; display: inline-block; }
+        this.socket.onmessage = (message) => {
+            const data = JSON.parse(message.data);
+            this.handleIncomingData(data);
+        };
 
-        /* Dynamic Contract Settle Layout Rows */
-        .settled-item-container { background: #1f262f; border: 1px solid #2e353f; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .settle-badge { background: rgba(0, 192, 118, 0.15); color: #00c076; font-weight: bold; padding: 3px 6px; border-radius: 4px; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; display: inline-block; }
-        .pnl-green { color: #00c076; font-size: 16px; font-weight: bold; }
+        this.socket.onerror = (error) => {
+            console.error("WebSocket Error: ", error);
+        };
 
-        /* Summary Analytics Display Cards */
-        .analytics-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        .analytic-tile { flex: 1; min-width: 46%; background: #1f262f; padding: 10px; border-radius: 4px; border: 1px solid #2e353f; }
-        .tile-lbl { font-size: 11px; color: #848e9c; margin-bottom: 2px; }
-        .tile-val { font-size: 15px; font-weight: bold; }
+        this.socket.onclose = () => {
+            console.log("Connection closed. Reconnecting...");
+            setTimeout(() => this.init(), 5000); // Auto-reconnect after 5 seconds
+        };
+    }
 
-        /* Journal Output Terminal Lines */
-        .terminal-shell { background: #090c0f; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 12px; color: #a1b0c0; max-height: 250px; overflow-y: auto; line-height: 1.6; }
-        .shell-line { border-bottom: 1px solid #13171c; padding: 4px 0; }
+    // 2. Authenticate the User using their API Token
+    authorize(apiToken) {
+        if (this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({ authorize: apiToken }));
+        } else {
+            console.error("Cannot authorize. Socket is not open.");
+        }
+    }
 
-        /* Fixed Footer Runtime Control Mechanics */
-        .bottom-sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #161a1e; border-top: 1px solid #1f262f; padding: 12px; display: flex; gap: 10px; justify-content: center; z-index: 900; }
-        .btn-action-core { flex: 1; max-width: 180px; border: none; padding: 14px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; color: #fff; }
-        .btn-start-run { background: #00c076; }
-        .btn-stop-kill { background: #cf304a; display: none; }
-        .status-marquee-msg { color: #848e9c; font-size: 12px; text-align: center; margin-top: 4px; }
-    </style>
-</head>
-<body>
+    // 3. Subscribe to Live Market Assets (e.g., Volatility 100 Index or Forex pairs)
+    subscribeToTicks(symbol = 'R_100') {
+        if (this.socket.readyState === WebSocket.OPEN) {
+            console.log(`Subscribing to real-time ticks for: ${symbol}`);
+            this.socket.send(JSON.stringify({ ticks: symbol }));
+        }
+    }
 
-    <!-- Header Frame View -->
-    <div class="deriv-top-nav">
-        <div class="nav-branding">
-            <span class="menu-bars">☰</span>
-            <div class="badge-country">KSH USD</div>
-        </div>
-        <div class="nav-actions">
-            <button class="btn-withdraw">Withdraw</button>
-            <div class="profile-wallet-trigger" onclick="toggleAccountModal(true)">
-                <span class="flag-placeholder" id="flag-display">🇺🇸</span>
-                <span class="live-balance-num" id="display-top-balance">0.26 USD</span>
-                <span class="arrow-indicator">▼</span>
-            </div>
-        </div>
-    </div>
+    // 4. Place a Trade Contract (Buy Rise/Fall or Higher/Lower)
+    placeTrade(amount, contractType, currency = 'USD', duration = 1, durationUnit = 'm', symbol = 'R_100') {
+        if (!this.isAuthorized) {
+            console.error("You must authorize your API token before placing a trade.");
+            return;
+        }
 
-    <!-- Category Nav Controls -->
-    <div class="workspace-tabs">
-        <div class="workspace-tab-item" id="tab-btn-summary" onclick="navigateToPanel('summary')">Summary</div>
-        <div class="workspace-tab-item active" id="tab-btn-transactions" onclick="navigateToPanel('transactions')">Transactions</div>
-        <div class="workspace-tab-item" id="tab-btn-journal" onclick="navigateToPanel('journal')">Journal</div>
-    </div>
+        const proposalRequest = {
+            buy: 1,
+            price: amount,
+            parameters: {
+                amount: amount,
+                basis: "stake",
+                contract_type: contractType, // 'CALL' (Rise/Up) or 'PUT' (Fall/Down)
+                currency: currency,
+                duration: duration,
+                duration_unit: durationUnit,
+                symbol: symbol
+            }
+        };
 
-    <!-- Central Viewport Display Layout Container -->
-    <div class="app-workspace-body">
-        
-        <!-- Summary Dashboard Viewport Matrix Panel -->
-        <div id="panel-summary" style="display: none;">
-            <div class="ui-panel-card">
-                <h3>Quick Parameters Settings</h3>
-                <div class="form-row">
-                    <label>Target Execution Asset Index</label>
-                    <select id="config-market-target">
-                        <option value="Volatility 100 Index">Volatility 100 Index</option>
-                        <option value="Volatility 15 (1s) Index">Volatility 15 (1s) Index</option>
-                    </select>
-                </div>
-                <div class="form-row">
-                    <label>Contract Target Sizing Stake (USD)</label>
-                    <input type="number" id="config-stake-amount" value="5.00" step="1">
-                </div>
-                <div class="form-row">
-                    <label>Digit Over/Under Prediction Sizing</label>
-                    <input type="number" id="config-prediction" value="1" min="0" max="9">
-                </div>
-            </div>
-        </div>
+        this.socket.send(JSON.stringify(proposalRequest));
+    }
 
-        <!-- Transactions Dashboard Feed Viewport Panel -->
-        <div id="panel-transactions">
-            <!-- Analytics Summary Component -->
-            <div class="ui-panel-card" style="margin-bottom:12px;">
-                <div class="analytics-grid">
-                    <div class="analytic-tile"><div class="tile-lbl">Total stake</div><div class="tile-val" id="stat-stake">0.00 USD</div></div>
-                    <div class="analytic-tile"><div class="tile-lbl">Total payout</div><div class="tile-val" id="stat-payout">0.00 USD</div></div>
-                    <div class="analytic-tile"><div class="tile-lbl">No. of runs</div><div class="tile-val" id="stat-runs">0</div></div>
-                    <div class="analytic-tile"><div class="tile-lbl">Total profit/loss</div><div class="tile-val" id="stat-pnl" style="color:#848e9c;">0.00 USD</div></div>
-                    <div class="analytic-tile"><div class="tile-lbl">Contracts won</div><div class="tile-val" id="stat-won" style="color:#00c076;">0</div></div>
-                    <div class="analytic-tile"><div class="tile-lbl">Contracts lost</div><div class="tile-val" id="stat-lost" style="color:#cf304a;">0</div></div>
-                </div>
-            </div>
+    // 5. Route Incoming API Responses to UI Components
+    handleIncomingData(data) {
+        const msgType = data.msg_type;
 
-            <!-- List rows feed -->
-            <div id="contracts-feed-rows-container">
-                <!-- Transaction log list cards settle here dynamically -->
-            </div>
-        </div>
+        switch (msgType) {
+            case 'authorize':
+                if (data.error) {
+                    console.error("Authorization Failed:", data.error.message);
+                    this.isAuthorized = false;
+                } else {
+                    console.log(`Authorized successfully! Welcome ${data.authorize.email}`);
+                    this.isAuthorized = true;
+                    // Update UI with Virtual Account Balance ($10,000)
+                    document.getElementById('balance-display').innerText = `$${data.authorize.balance}`;
+                }
+                break;
 
-        <!-- Journal Console Viewport Terminal Panel -->
-        <div id="panel-journal" style="display: none;">
-            <div class="ui-panel-card">
-                <h3>System Core Diagnostics Logs</h3>
-                <div class="terminal-shell" id="journal-console-container">
-                    <!-- Lines push directly inside -->
-                </div>
-            </div>
-        </div>
+            case 'tick':
+                if (data.tick) {
+                    const price = data.tick.quote;
+                    const epoch = data.tick.epoch;
+                    this.updateUIChart(price, epoch);
+                }
+                break;
 
-    </div>
+            case 'buy':
+                if (data.error) {
+                    console.error("Trade Execution Failed:", data.error.message);
+                } else {
+                    console.log(`Trade placed! Contract ID: ${data.buy.contract_id}`);
+                }
+                break;
 
-    <!-- Fixed Core Controls Footer Frame -->
-    <div class="bottom-sticky-bar">
-        <div style="flex:1; max-width:380px; display:flex; flex-direction:column;">
-            <div style="display:flex; gap:10px;">
-                
+            default:
+                break;
+        }
+    }
+
+    // 6. UI Render Placeholders (To link with your cloned frontend template)
+    updateUIChart(price, time) {
+        // Send this live stream data straight to your chart UI component
+        const priceElement = document.getElementById('live-price-ticker');
+        if (priceElement) {
+            priceElement.innerText = price;
+        }
+    }
+
+    startKeepAlive() {
+        setInterval(() => {
+            if (this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify({ ping: 1 }));
+            }
+        }, 30000);
+    }
+}
+
+// Example Usage on your cloned page:
+// const botEngine = new DerivTradingEngine('YOUR_DERIV_APP_ID');
+// botEngine.init();
+// botEngine.authorize('YOUR_USER_API_TOKEN');
+// botEngine.subscribeToTicks('R_100');
+

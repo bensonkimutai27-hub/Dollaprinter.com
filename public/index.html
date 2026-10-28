@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuantumTrade | Precision Workspace</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Charting Library Integration -->
+    <!-- Real-time Financial Charting Library -->
     <script src="https://unpkg.com"></script>
 </head>
 <body>
@@ -43,7 +43,6 @@
                 <label for="strategy-select">Trading Algorithm</label>
                 <select id="strategy-select">
                     <option value="martingale">Martingale Multiplier</option>
-                    <option value="rsi_trend">RSI Trend Follower</option>
                 </select>
             </div>
 
@@ -58,7 +57,7 @@
                     Live Price: <span id="live-price-ticker">Loading...</span>
                 </div>
             </div>
-            <!-- The charting library will automatically inject the interactive graph canvas inside this wrapper div -->
+            <!-- The charting library automatically paints inside this div -->
             <div id="tv-chart-wrapper"></div>
         </section>
 
@@ -68,12 +67,8 @@
             <p class="panel-desc">Instantly buy or sell contracts directly to the market engine.</p>
             
             <div class="execution-buttons">
-                <button id="btn-rise" class="btn btn-success">
-                    <span class="icon">▲</span> Rise / Call
-                </button>
-                <button id="btn-fall" class="btn btn-danger">
-                    <span class="icon">▼</span> Fall / Put
-                </button>
+                <button id="btn-rise" class="btn btn-success">▲ Rise / Call</button>
+                <button id="btn-fall" class="btn btn-danger">▼ Fall / Put</button>
             </div>
 
             <div class="activity-log">
@@ -86,8 +81,7 @@
 
     </main>
 
-    <!-- Core WebSocket Link -->
+    <!-- Core WebSocket Engine Link -->
     <script src="deriv-trading-bot.js"></script>
 </body>
-                </html>
-                
+</html>

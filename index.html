@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kamaufx Dashboard Demo</title>
+  <style>
+    :root { --navy:#0c1734; --navy2:#17264e; --pink:#ff6689; --cyan:#27c8d5; --ink:#172033; --muted:#667085; --line:#d8dde6; --pale:#f2f5fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; background:#f4f6fa; color:var(--ink); }
+    .topbar { height:76px; background:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 22px; border-bottom:1px solid #e3e7ef; gap:14px; }
+    .brand { display:flex; align-items:center; gap:9px; font-size:24px; font-weight:800; color:#4b5565; white-space:nowrap; }
+    .brand small { display:block; font-size:11px; font-weight:500; color:#8a93a4; margin-top:-2px; }
+    .chat { display:grid; place-items:center; background:#209be2; color:#fff; width:42px; height:34px; border-radius:20px; font-size:20px; }
+    .account { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; white-space:nowrap; }
+    .flag { font-size:28px; }
+    .hamb { border:0; background:transparent; font-size:25px; color:#667085; padding:6px; cursor:pointer; }
+    .hero { background:#030916; min-height:190px; padding:14px 18px 32px; color:white; position:relative; overflow:hidden; }
+    .nav { display:flex; background:#0c1734; min-height:76px; max-width:1100px; margin:0 auto; }
+    .nav button { border:0; color:#fff; background:transparent; flex:1; min-width:0; font-size:18px; font-weight:700; padding:20px 12px; cursor:pointer; }
+    .nav button span { color:var(--pink); margin-right:14px; }
+    .nav button.active { background:#1b2b57; }
+    .dots { position:absolute; right:8%; bottom:25px; color:#2c719f; letter-spacing:22px; font-size:24px; }
+    .hero-line { position:absolute; height:3px; width:180px; background:#e64baf; transform:rotate(-28deg); right:-25px; bottom:15px; }
+    main { max-width:1100px; margin:24px auto; padding:0 18px; }
+    .welcome { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+    h1 { margin:0 0 6px; font-size:25px; }
+    .sub { color:#6c7688; font-size:14px; }
+    .balance { background:#fff; border:1px solid #e1e6ef; border-radius:12px; padding:15px 18px; min-width:160px; box-shadow:0 3px 12px #18274b0a; }
+    .balance span { display:block; color:#7b8493; font-size:12px; margin-bottom:7px; }
+    .balance strong { font-size:24px; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
+    .card { background:#fff; border:1px solid #e1e6ef; border-radius:12px; padding:18px; box-shadow:0 3px 12px #18274b08; }
+    .card .label { color:#697386; font-size:13px; }
+    .card .number { font-size:26px; font-weight:800; margin-top:10px; }
+    .card .note { color:#8b94a3; font-size:12px; margin-top:6px; }
+    .panel { background:#fff; border:1px solid #dce1e9; margin-bottom:18px; }
+    .panel-head { padding:16px 18px; border-bottom:1px solid #dce1e9; font-size:19px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+    .tools { color:#737d8d; font-size:18px; letter-spacing:8px; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    th,td { padding:10px 12px; text-align:left; border-bottom:1px solid #e5e9f0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    th { color:#465164; background:#fafbfd; font-weight:500; }
+    tbody tr:nth-child(even) { background:#f1f5fb; }
+    td:first-child { width:34%; }
+    .value { color:#3f4a5b; }
+    .status { display:inline-block; color:#17834e; background:#e6f7ed; padding:4px 8px; border-radius:20px; font-size:12px; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .notice { color:#657083; background:#fff; padding:15px 18px; border:1px solid #e0e5ed; border-radius:8px; line-height:1.5; }
+    footer { text-align:center; color:#8992a0; padding:24px 12px 35px; font-size:12px; }
+    @media(max-width:650px) {
+      .topbar { height:68px; padding:0 12px; }
+      .brand { font-size:20px; gap:6px; }
+      .chat { width:34px; height:30px; font-size:17px; }
+      .account { font-size:15px; gap:6px; }
+      .flag { font-size:23px; }
+      .hero { padding:12px 12px 28px; min-height:120px; }
+      .nav { min-height:64px; }
+      .nav button { padding:14px 7px; font-size:13px; }
+      .nav button span { margin-right:4px; }
+      main { margin:18px auto; padding:0 10px; }
+      .welcome { align-items:flex-start; }
+      h1 { font-size:21px; }
+      .balance { min-width:110px; padding:12px; }
+      .balance strong { font-size:20px; }
+      .cards { grid-template-columns:1fr; gap:10px; }
+      .card { padding:14px; }
+      .panel-head { font-size:16px; padding:13px; }
+      th,td { padding:9px 8px; font-size:12px; }
+      td:first-child { width:38%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <button class="hamb" aria-label="Menu" onclick="toggleMenu()">☰</button>
+    <div class="brand">Kamaufx <div><small>powered by <b style="color:#ff6689">deriv</b></small></div><span class="chat">•••</span></div>
+    <div class="account"><span class="flag">🇺🇸</span><span>0.26 USD</span><span style="font-size:22px">⌄</span></div>
+  </header>
+  <section class="hero">
+    <nav class="nav" id="mainNav" aria-label="Main navigation">
+      <button class="active" data-tab="dashboard"><span>▦</span>Dashboard</button>
+      <button data-tab="builder"><span>♙</span>Bot Builder</button>
+      <button data-tab="freebots"><span>▣</span>Free Bots</button>
+    </nav>
+    <div class="dots">• • • • •</div><div class="hero-line"></div>
+  </section>
+  <main>
+    <section id="dashboard" class="tab-content active">
+      <div class="welcome">
+        <div><h1>Dashboard</h1><div class="sub">Overview of your demo workspace</div></div>
+        <div class="balance"><span>Account balance</span><strong>0.26 USD</strong></div>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="label">Demo balance</div><div class="number">10,000</div><div class="note">Sample display value</div></div>
+        <div class="card"><div class="label">Account type</div><div class="number">Real</div><div class="note">Visual mockup only</div></div>
+        <div class="card"><div class="label">Bot version</div><div class="number">2</div><div class="note">Dashboard interface demo</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Resources <span class="tools">▽ ⊘ × ▢ ◉ ↻</span></div>
+        <table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>
+          <tr><td>emiibuild_tenant</td><td class="value">{"status":"live","ui_variant":"dashboard"}</td></tr>
+          <tr><td>bot.chart_props</td><td class="value">{"symbol":"1HZ100V","granularity":0,"chart_type":"line"}</td></tr>
+          <tr><td>mkt_demo_balance</td><td class="value">10000</td></tr>
+          <tr><td>account_type</td><td class="value">real</td></tr>
+          <tr><td>active_tab</td><td class="value">0</td></tr>
+          <tr><td>known_account</td><td class="value">{"balance":0.26,"currency":"USD"}</td></tr>
+          <tr><td>sim_balance</td><td class="value">235.66</td></tr>
+          <tr><td>bot_version</td><td class="value">2</td></tr>
+          <tr><td>active_loginid</td><td class="value">DEMO123456</td></tr>
+        </tbody></table>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Session Storage <span class="tools">▽ ⊘ × ▢ ◉ ↻</span></div>
+        <table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>
+          <tr><td>deriv_accounts</td><td class="value">[{"account_id":"DEMO123456","balance":"0.26","currency":"USD"}]</td></tr>
+          <tr><td>auth_info</td><td class="value">{"access_token":"••••••••••••••••••"}</td></tr>
+          <tr><td>journal_cache</td><td class="value">{"date":"2026-10-29","time":"16:11"}</td></tr>
+        </tbody></table>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Cookie <span class="tools">▽ ⊘ × ▢ ◉ ↻</span></div>
+        <table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>
+          <tr><td>client_information</td><td class="value">{"loginid":"DEMO123456","email":"","currency":"USD"}</td></tr>
+        </tbody></table>
+      </div>
+      <div class="panel">
+        <div class="panel-head" style="color:#d92d20;background:#fff5f5">Script</div>
+        <div style="padding:16px;overflow-wrap:anywhere;color:#245c9c;text-decoration:underline">https://apis.google.com/js/api.js</div>
+      </div>
+    </section>
+    <section id="builder" class="tab-content">
+      <div class="welcome"><div><h1>Bot Builder</h1><div class="sub">Create a sample bot layout</div></div></div>
+      <div class="panel"><div class="panel-head">Bot Builder</div><div style="padding:18px">
+        <label for="botName">Bot name</label><br><input id="botName" value="My Demo Bot" style="margin:8px 0 16px;padding:12px;width:100%;max-width:420px;border:1px solid #ccd3df;border-radius:6px">
+        <p><label><input type="checkbox" checked> Enable chart preview</label></p>
+        <p><label><input type="checkbox"> Use demo mode</label></p>
+        <button onclick="alert('This is a visual demo. No trading or account actions are connected.')" style="background:#1c2c58;color:white;border:0;border-radius:6px;padding:12px 18px;font-weight:bold">Save demo settings</button>
+      </div></div>
+    </section>
+    <section id="freebots" class="tab-content">
+      <div class="welcome"><div><h1>Free Bots</h1><div class="sub">Sample bot cards for the recreated interface</div></div></div>
+      <div class="cards">
+        <div class="card"><div class="label">Bot template</div><div class="number" style="font-size:20px">Starter Bot</div><div class="note">Basic sample layout</div><p><span class="status">Free demo</span></p></div>
+        <div class="card"><div class="label">Bot template</div><div class="number" style="font-size:20px">Trend Bot</div><div class="note">Illustrative interface only</div><p><span class="status">Free demo</span></p></div>
+        <div class="card"><div class="label">Bot template</div><div class="number" style="font-size:20px">Practice Bot</div><div class="note">No live trading connected</div><p><span class="status">Free demo</span></p></div>
+      </div>
+    </section>
+    <div class="notice">This is an independent visual recreation for demonstration. It does not connect to Kamaufx, Deriv, real accounts, trading systems, or private services. Replace sample values and branding as appropriate for your authorized project.</div>
+  </main>
+  <footer>Dashboard interface demo · Static website · No account credentials collected</footer>
+  <script>
+    const buttons = document.querySelectorAll('.nav button');
+    buttons.forEach(button => button.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
+      document.getElementById(button.dataset.tab).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }));
+    function toggleMenu() {
+      const nav = document.getElementById('mainNav');
+      nav.style.display = nav.style.display === 'none' ? 'flex' : 'flex';
+      document.querySelector('main').scrollIntoView({behavior:'smooth'});
+    }
+  </script>
+</body>
+</html>

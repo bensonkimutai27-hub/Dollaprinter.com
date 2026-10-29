@@ -1,93 +1,95 @@
-<!doctype html>
-<html lang="en" dir="auto" class="light">
-    <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumTrade Workspace</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/dollacount.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-        <!-- App loader logo: fetched alongside the JS bundle so it is ready when the loader shows. -->
-        <link
-            rel="preload"
-            as="image"
-            type="image/webp"
-            href="/dollacount-loader-960.webp"
-            imagesrcset="/dollacount-loader-640.webp 640w, /dollacount-loader-960.webp 960w"
-            imagesizes="(max-width: 540px) 86vw, 440px"
-            fetchpriority="high"
-        />
-        <meta name="title" content="Automate Your Trades | Deriv Bot" />
-        <meta
-            name="description"
-            content="Import your current bot or learn how to create a trading bot from scratch with our detailed guides, FAQs, and tutorials. Start with a quick strategy!"
-        />
-        <meta property="og:title" content="Deriv Bot" />
-        <meta
-            property="og:description"
-            content="Import your current bot or learn how to create a trading bot from scratch with our detailed guides, FAQs, and tutorials. Start with a quick strategy!"
-        />
-        <title>Automate Your Trades | Deriv Bot</title>
-        <style>
-            :root {
-                font-size: 62.5%;
-            }
-        </style>
-    <script defer src="/static/js/lib-react.0541f1db.js"></script><script defer src="/static/js/lib-router.8fb53a70.js"></script><script defer src="/static/js/42.6d0d26b7.js"></script><script defer src="/static/js/index.244add20.js"></script><link href="/static/css/42.3560e13e.css" rel="stylesheet"><link href="/static/css/index.981e2266.css" rel="stylesheet"></head>
+    <!-- Main App Container mimicking premium web trading layouts -->
+    <div id="app-root" class="trading-workspace-container">
+        
+        <!-- Header Ribbon Component -->
+        <header class="app-header-ribbon">
+            <div class="brand-logo-wrapper">
+                <span class="logo-accent-text">QUANTUM</span>TRADE
+            </div>
+            <div class="account-status-pill">
+                <div class="status-indicator-dot online"></div>
+                <div class="account-type-label">Demo Account</div>
+                <div id="balance-display" class="account-balance-amount">$10,000.00</div>
+            </div>
+        </header>
 
-    <body class="body theme theme--light">
-        <script>
-            // Light by default; dark only if the visitor chose it (see src/utils/theme.ts).
-            try {
-                if (localStorage.getItem('theme_choice') === 'dark') {
-                    document.body.classList.replace('theme--light', 'theme--dark');
-                }
-            } catch (e) {}
-        </script>
+        <!-- Dynamic Main Stage Layout -->
+        <main class="workspace-viewport-stage">
+            
+            <!-- Asset Stream Graphic Panel -->
+            <section class="workspace-card chart-visualization-panel">
+                <div class="panel-header-toolbar">
+                    
+                        <h2 id="active-asset-title">Volatility 100 Index</h2>
+                    </div>
+                    <div class="live-ticker-price-badge">
+                        <span id="live-price-ticker" class="ticker-price-stream">Connecting...</span>
+                    </div>
+                </div>
+                <div class="canvas-render-wrapper">
+                    <canvas id="market-canvas-layer"></canvas>
+                </div>
+            </section>
 
-        <div id="modal_root" class="modal-root"></div>
-        <div id="popup_root" class="popup-root"></div>
-        <div id="root"></div>
-        <!-- LiveChat script -->
-        <script type="text/javascript" defer>
-            window.__lc = window.__lc || {};
-            window.__lc.license = 12049137;
-            window.__lc.asyncInit = true;
-            (function (n, t, c) {
-                function i(n) {
-                    return e._h ? e._h.apply(null, n) : e._q.push(n);
-                }
-                var e = {
-                    _q: [],
-                    _h: null,
-                    _v: '2.0',
-                    on: function () {
-                        i(['on', c.call(arguments)]);
-                    },
-                    once: function () {
-                        i(['once', c.call(arguments)]);
-                    },
-                    off: function () {
-                        i(['off', c.call(arguments)]);
-                    },
-                    get: function () {
-                        if (!e._h) throw new Error('[LiveChatWidget] You can’t use getters before load.');
-                        return i(['get', c.call(arguments)]);
-                    },
-                    call: function () {
-                        i(['call', c.call(arguments)]);
-                    },
-                    init: function () {
-                        setTimeout(() => {
-                            var n = t.createElement('script');
-                            ((n.async = !0),
-                                (n.type = 'text/javascript'),
-                                (n.src = 'https://cdn.livechatinc.com/tracking.js'),
-                                t.head.appendChild(n));
-                        }, 3000);
-                    },
-                };
-                (!n.__lc.asyncInit && e.init(), (n.LiveChatWidget = n.LiveChatWidget || e));
-            })(window, document, [].slice);
-        </script>
-        <!-- End LiveChat script -->
-    </body>
+            <!-- Execution Panel Controller Container -->
+            <section class="workspace-card engine-execution-panel">
+                <div class="form-control-row">
+                    <label class="input-field-header">Market Asset Group</label>
+                    <select id="asset-select" class="custom-dashboard-select">
+                        <option value="R_100">Volatility 100 Index</option>
+                        <option value="R_50">Volatility 50 Index</option>
+                        <option value="frxEURUSD">EUR/USD Forex Pair</option>
+                    </select>
+                </div>
+
+                <div class="form-control-row">
+                    <label class="input-field-header">Stake Value Allocation (USD)</label>
+                    <div class="numeric-input-wrapper">
+                        <input type="number" id="stake-amount" class="custom-dashboard-input" value="10" min="1">
+                        <span class="input-currency-suffix">USD</span>
+                    </div>
+                </div>
+
+                <div class="form-control-row">
+                    <label class="input-field-header">Automation Algorithm Logic</label>
+                    <select id="strategy-select" class="custom-dashboard-select">
+                        <option value="martingale">Martingale Recursive Loop</option>
+                    </select>
+                </div>
+
+                <!-- Action Button Matrix -->
+                <div class="action-trigger-matrix">
+                    <button id="start-bot-btn" class="dashboard-action-btn action-prime">Activate Auto-Bot Engine</button>
+                    
+                    <div class="manual-override-split-row">
+                        <button id="btn-rise" class="dashboard-action-btn action-success">▲ Call Option</button>
+                        <button id="btn-fall" class="dashboard-action-btn action-danger">▼ Put Option</button>
+                    </div>
+                </div>
+
+                <!-- Streaming Activity Log Console Terminal -->
+                <div class="terminal-logs-component">
+                    <h3 class="terminal-header-title">System Activity Log Buffer</h3>
+                    <div id="log-console" class="terminal-body-stream">
+                        <div class="log-line system-trace">[System]: Initialized workspace matrix container layers...</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Core App Logic Controller Module -->
+    <script src="deriv-trading-bot.js"></script>
+</body>
 </html>

@@ -1,186 +1,232 @@
 :root {
-    --bg-main: #0b0e11;
-    --bg-panel: #151a22;
-    --bg-input: #1e2633;
-    --text-primary: #eaecef;
-    --text-muted: #848e9c;
-    --color-accent: #f0b90b;
-    --color-success: #0ecb81;
-    --color-danger: #f6465d;
-    --border-color: #2b3648;
+    --hex-bg-deep: #06090c;
+    --hex-bg-card: #0d1117;
+    --hex-bg-field: #161b22;
+    --hex-border: #21262d;
+    --hex-txt-main: #c9d1d9;
+    --hex-txt-mute: #8b949e;
+    --hex-accent: #f0b90b;
+    --hex-green: #238636;
+    --hex-red: #da3637;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    overflow-y: auto; /* Allow smooth scrolling on mobile */
+    background-color: var(--hex-bg-deep);
+    color: var(--hex-txt-main);
+    padding: 10px;
 }
 
-.navbar {
+.trading-workspace-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header Navbar Styling Elements */
+.app-header-ribbon {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: var(--bg-panel);
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--hex-bg-card);
+    border: 1px solid var(--hex-border);
+    padding: 14px 20px;
+    border-radius: 6px;
 }
 
-.logo {
+.brand-logo-wrapper {
     font-weight: 800;
-    font-size: 18px;
+    font-size: 16px;
     letter-spacing: 0.5px;
 }
 
-.logo span { color: var(--color-accent); }
+.logo-accent-text { color: var(--hex-accent); }
 
-.user-profile {
+.account-status-pill {
     display: flex;
     align-items: center;
-    gap: 10px;
+    background-color: var(--hex-bg-field);
+    border: 1px solid var(--hex-border);
+    padding: 6px 12px;
+    border-radius: 20px;
+    gap: 8px;
 }
 
-.badge {
-    background: #2b3648;
-    padding: 4px 8px;
-    border-radius: 4px;
+.status-indicator-dot.online {
+    width: 6px;
+    height: 6px;
+    background-color: #58a6ff;
+    border-radius: 50%;
+}
+
+.account-type-label {
     font-size: 11px;
-    color: var(--text-muted);
-}
-
-.balance {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--color-success);
-}
-
-/* Updated Layout: Flex container that naturally stacks on mobile */
-.dashboard-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-}
-
-.panel {
-    background-color: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.panel h2 {
-    font-size: 14px;
-    margin-bottom: 15px;
+    color: var(--hex-txt-mute);
     text-transform: uppercase;
-    color: var(--text-muted);
 }
 
-.control-group { margin-bottom: 15px; }
-
-.control-group label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
+.account-balance-amount {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--hex-accent);
 }
 
-select, input {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    color: var(--text-primary);
-    font-size: 14px;
+/* Fluid Workspace Layout Staging Area */
+.workspace-viewport-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
+.workspace-card {
+    background-color: var(--hex-bg-card);
+    border: 1px solid var(--hex-border);
+    border-radius: 6px;
+    padding: 16px;
 }
 
-.btn-primary { background-color: var(--color-accent); color: #000; }
-.btn-success { background-color: var(--color-success); color: #fff; }
-.btn-danger { background-color: var(--color-danger); color: #fff; }
-
-.chart-container { order: -1; } /* Pushes the live chart to the top of the mobile screen */
-
-.chart-header {
+.panel-header-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
 }
 
-.chart-header h3 {
+.panel-header-toolbar h2 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ticker-price-stream {
+    font-family: monospace;
+    font-weight: 700;
     font-size: 15px;
-}
-
-.ticker-box {
-    background-color: var(--bg-input);
-    padding: 6px 12px;
+    color: var(--hex-accent);
+    background-color: var(--hex-bg-field);
+    padding: 4px 10px;
     border-radius: 4px;
-    font-size: 13px;
 }
 
-#tv-chart-wrapper {
+.canvas-render-wrapper {
+    background-color: var(--hex-bg-deep);
+    border: 1px solid var(--hex-border);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+#market-canvas-layer {
+    display: block;
     width: 100%;
-    background-color: #0b0e11;
+}
+
+/* Control Elements Form Matrix */
+.form-control-row {
+    margin-bottom: 14px;
+}
+
+.input-field-header {
+    display: block;
+    font-size: 11px;
+    color: var(--hex-txt-mute);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.custom-dashboard-select, .custom-dashboard-input {
+    width: 100%;
+    background-color: var(--hex-bg-field);
+    border: 1px solid var(--hex-border);
+    color: var(--hex-txt-main);
+    padding: 12px;
+    font-size: 14px;
     border-radius: 4px;
-    height: 300px; /* Explicit height ensures the TradingView chart area displays on phone screens */
+    outline: none;
 }
 
-.panel-desc {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 15px;
-}
-
-.execution-buttons {
+.numeric-input-wrapper {
+    position: relative;
     display: flex;
-    gap: 10px; /* Aligns buy/sell side-by-side on mobile devices */
+    align-items: center;
+}
+
+.input-currency-suffix {
+    position: absolute;
+    right: 14px;
+    font-size: 11px;
+    color: var(--hex-txt-mute);
+}
+
+/* Button Configurations Element Block Matrix */
+.action-trigger-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
-.activity-log { display: flex; flex-direction: column; }
-
-.console {
-    background-color: #0b0e11;
-    border: 1px solid var(--border-color);
+.dashboard-action-btn {
+    border: none;
     border-radius: 4px;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 11px;
-    overflow-y: auto;
-    height: 150px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px;
+    cursor: pointer;
+    width: 100%;
+    color: #ffffff;
+    transition: filter 0.15s ease;
 }
 
-.log-line { margin-bottom: 6px; }
-.log-line.system { color: var(--color-accent); }
+.dashboard-action-btn:active { filter: brightness(0.85); }
 
-/* Desktop view: Automatically restores side-by-side panels on computers */
-@media (min-width: 900px) {
-    .dashboard-grid {
+.action-prime { background-color: var(--hex-accent); color: #000000; }
+.action-success { background-color: var(--hex-green); }
+.action-danger { background-color: var(--hex-red); }
+
+.manual-override-split-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Log Box System Component Layer */
+.terminal-logs-component {
+    margin-top: 10px;
+}
+
+.terminal-header-title {
+    font-size: 11px;
+    color: var(--hex-txt-mute);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.terminal-body-stream {
+    background-color: var(--hex-bg-deep);
+    border: 1px solid var(--hex-border);
+    border-radius: 4px;
+    padding: 10px;
+    height: 140px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.log-line.system-trace { color: var(--hex-accent); }
+
+/* Responsive Layout Mapping to Desktop Screens automatically */
+@media (min-width: 850px) {
+    .workspace-viewport-stage {
         display: grid;
-        grid-template-columns: 300px 1fr 320px;
-        height: calc(100vh - 60px);
+        grid-template-columns: 1fr 340px;
     }
-    .chart-container { order: 0; }
-    #tv-chart-wrapper { height: 100%; }
-    .execution-buttons { flex-direction: column; }
-    .console { height: 100%; max-height: 220px; }
-    }
+               }
